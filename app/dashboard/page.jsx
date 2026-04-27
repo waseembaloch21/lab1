@@ -119,6 +119,10 @@ export default function DashboardPage() {
             </div>
           </a>
         ))}
+
+        <p className="text-white text-center items-center justify-center flex mt-4">
+         &copy; {new Date().getFullYear()} Waseem Baloch. All rights reserved.
+           </p>
       </div>
     </div>
   )

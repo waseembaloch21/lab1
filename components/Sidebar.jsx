@@ -49,7 +49,7 @@ export default function Sidebar({ userName = '', userRole = '' }) {
         </div>
       </div>
 
-      {/* Nav */}
+     
       <nav style={{ padding:'1rem 0.75rem', flex:1, display:'flex', flexDirection:'column', gap:'0.25rem' }}>
         <div style={{ fontSize:'0.7rem', fontWeight:600, letterSpacing:'0.08em', color:'var(--text-muted)', padding:'0 0.5rem', marginBottom:'0.5rem' }}>NAVIGATION</div>
         {navItems.map(item => (
