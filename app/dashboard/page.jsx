@@ -19,12 +19,10 @@ export default function DashboardPage() {
       Loading dashboard...
     </div>
   )
-
   if (!data) return null
-
   return (
     <div style={{ padding:'2rem', maxWidth:1200 }} className="animate-fade">
-      {/* Header */}
+     
       <div style={{ marginBottom:'2rem' }}>
         <h1 style={{ fontSize:'1.75rem', fontWeight:700, letterSpacing:'-0.02em' }}>Dashboard</h1>
         <p style={{ color:'var(--text-secondary)', marginTop:'0.25rem' }}>
@@ -53,9 +51,9 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.5rem' }}>
-        {/* Recent Employees */}
-        <div className="card" style={{ padding:'1.5rem' }}>
+      <div className=' grid sm:grid-cols-1 grid-cols-1 gap-4 mt-6 md:grid-cols-2'>
+        
+        <div className="card" style={{ padding:'1.5rem',  marginBottom:'1.5rem' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.25rem' }}>
             <h2 style={{ fontWeight:600, fontSize:'1rem' }}>Recent Employees</h2>
             <a href="/employees" style={{ fontSize:'0.8rem', color:'var(--brand)', textDecoration:'none' }}>View all →</a>
@@ -79,7 +77,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Dept Breakdown */}
-        <div className="card" style={{ padding:'1.5rem' }}>
+        <div className="card " style={{ padding:'1.5rem', marginBottom:'1.5rem'   }}>
           <h2 style={{ fontWeight:600, fontSize:'1rem', marginBottom:'1.25rem' }}>Department Overview</h2>
           <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
             {data.deptBreakdown.map((d, i) => {
@@ -103,7 +101,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Links */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1rem', marginTop:'1.5rem' }}>
+      <div className='sm:grid-cols-1 grid-cols-1 gap-4 mt-6 grid md:grid-cols-3'>
         {[
           { href:'/employees', label:'Manage Employees', desc:'Add, edit employee records', icon:'👤', color:'#5c7cfa' },
           { href:'/attendance', label:'Mark Attendance', desc:'Track daily attendance', icon:'📅', color:'#10b981' },
@@ -121,7 +119,7 @@ export default function DashboardPage() {
         ))}
 
         <p className="text-white text-center items-center justify-center flex mt-4">
-         &copy; {new Date().getFullYear()} Waseem Baloch. All rights reserved.
+         &copy; {new Date().getFullYear()} Waseem Baloch and Zakir Baloch. All rights reserved.
            </p>
       </div>
     </div>
