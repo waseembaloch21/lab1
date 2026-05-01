@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import { Alert, Flex, Spin } from 'antd';
 
 const fmt = (n) => {
   return new Intl.NumberFormat('en-PK').format(n || 0)
@@ -15,8 +16,7 @@ export default function DashboardPage() {
 
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', color:'var(--text-muted)', gap:'0.75rem' }}>
-      <svg className="spin" width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="30" strokeDashoffset="10"/></svg>
-      Loading dashboard...
+      <Spin description="Loading dashboard..." size="large" />
     </div>
   )
   if (!data) return null

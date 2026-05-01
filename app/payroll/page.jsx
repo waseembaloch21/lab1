@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Alert, Flex, Spin, message } from 'antd';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
@@ -15,6 +16,7 @@ export default function PayrollPage() {
   const [form, setForm] = useState({ employee_id:'', basic_salary:'', allowances:'0', overtime_pay:'0', deductions:'0', tax:'0', payment_method:'bank_transfer', notes:'' })
   const [saving, setSaving] = useState(false)
   const [updatingId, setUpdatingId] = useState(null)
+  const [messageApi, contextHolder] = message.useMessage();
 
   async function load() {
     setLoading(true)
@@ -34,25 +36,64 @@ export default function PayrollPage() {
   useEffect(() => { load() }, [month, year])
   useEffect(() => { loadEmployees() }, [])
 
-  async function handleSave() {
-    setSaving(true)
-   await fetch('/api/payroll', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ ...form, month, year })
-})
-    setShowModal(false); setSaving(false); load()
+ async function handleSave() {
+  setSaving(true)
+
+  try {
+    const res = await fetch('/api/payroll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form, month, year })
+    })
+
+    const text = await res.text()
+    const data = text ? JSON.parse(text) : {}
+
+    if (!res.ok) {
+      messageApi.error(data.error || 'Failed to add payroll')
+      return
+    }
+
+    // ✅ SUCCESS MESSAGE
+    messageApi.success('Payroll added successfully')
+
+    setShowModal(false)
+    load()
+
+  } catch (err) {
+    console.error(err)
+    messageApi.error('Network error')
+  } finally {
+    setSaving(false)
   }
+}
 
   async function updateStatus(id, status) {
-    setUpdatingId(id)
-   await fetch('/api/payroll', {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ id, payment_status: status })
-})
-    setUpdatingId(null); load()
+  setUpdatingId(id)
+
+  try {
+    const res = await fetch('/api/payroll', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, payment_status: status })
+    })
+
+    if (!res.ok) {
+      messageApi.error('Failed to update status')
+      return
+    }
+
+    messageApi.success(`Marked as ${status}`)
+
+    load()
+
+  } catch (err) {
+    console.error(err)
+    messageApi.error('Network error')
+  } finally {
+    setUpdatingId(null)
   }
+}
 
  const fmt = (n) => `PKR ${Number(n).toLocaleString('en-PK', { minimumFractionDigits: 0 })}`
 
@@ -65,6 +106,7 @@ export default function PayrollPage() {
 
   return (
     <div style={{ padding:'2rem', maxWidth:1300 }} className="animate-fade">
+       {contextHolder}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'2rem', flexWrap:'wrap', gap:'1rem' }}>
         <div>
           <h1 style={{ fontSize:'1.75rem', fontWeight:700, letterSpacing:'-0.02em' }}>Payroll</h1>
@@ -108,8 +150,7 @@ export default function PayrollPage() {
       <div className="card" style={{ overflow:'hidden' }}>
         {loading ? (
           <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'3rem', color:'var(--text-muted)', gap:'0.75rem' }}>
-            <svg className="spin" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="30" strokeDashoffset="10"/></svg>
-            Loading payroll...
+             <Spin description="Loading Payroll..." size="large" />
           </div>
         ) : records.length === 0 ? (
           <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)' }}>

@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Alert, Flex, Spin, message } from 'antd';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
@@ -14,6 +15,7 @@ export default function AttendancePage() {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ employee_id: '', date: now.toISOString().split('T')[0], check_in: '09:00', check_out: '18:00', status: 'present', notes: '' })
   const [saving, setSaving] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage();
 
   async function load() {
     setLoading(true)
@@ -36,7 +38,7 @@ export default function AttendancePage() {
     }
   }
 
-   async function loadEmployees() {
+  async function loadEmployees() {
     try {
       const res = await fetch('/api/employees')
       const text = await res.text()
@@ -49,15 +51,33 @@ export default function AttendancePage() {
     }
   }
 
-
   useEffect(() => { load() }, [month, year])
   useEffect(() => { loadEmployees() }, [])
 
   async function handleSave() {
     setSaving(true)
-    await fetch('/api/attendance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-    setShowModal(false); setSaving(false); load()
+    try {
+      const res = await fetch('/api/attendance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+      const text = await res.text()
+      const data = text ? JSON.parse(text) : {}
+
+      if (!res.ok) {
+        messageApi.error(data.error || 'Failed to save attendance')
+        return
+      }
+      messageApi.success('Attendance marked successfully')
+      setShowModal(false)
+      setSaving(false)
+      load()
+
+    } catch (err) {
+      console.error(err)
+      messageApi.error('Network error')
+    } finally {
+      setSaving(false)
+    }
   }
+
 
   async function handleDelete(id) {
     if (!confirm('Delete this record?')) return
@@ -72,6 +92,7 @@ export default function AttendancePage() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: 1300 }} className="animate-fade">
+      {contextHolder}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.02em' }}>Attendance</h1>
@@ -116,8 +137,7 @@ export default function AttendancePage() {
       <div className="card" style={{ overflow: 'hidden' }}>
         {loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem', color: 'var(--text-muted)', gap: '0.75rem' }}>
-            <svg className="spin" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="30" strokeDashoffset="10" /></svg>
-            Loading attendance...
+            <Spin description="Loading Attendance..." size="large" />
           </div>
         ) : records.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>

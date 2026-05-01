@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Button, message, Space, Spin } from 'antd';
+
 
 const EMPTY = { employee_id: '', first_name: '', last_name: '', email: '', phone: '', department_id: null, department_name: '', position: '', employment_type: 'full-time', status: 'active', hire_date: '', salary: '', address: '' }
 
@@ -15,6 +17,7 @@ export default function EmployeesPage() {
   const [form, setForm] = useState(EMPTY)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [messageApi, contextHolder] = message.useMessage();
 
   async function load() {
     setLoading(true)
@@ -109,6 +112,13 @@ export default function EmployeesPage() {
         setError(data.error || `Server error ${res.status}`)
         return
       }
+      messageApi.open({
+        type: 'success',
+        content: editing
+          ? 'Employee updated successfully'
+          : 'Employee added successfully',
+      })
+      
       setShowModal(false)
       load()
     } catch (err) {
@@ -137,6 +147,7 @@ export default function EmployeesPage() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: 1300 }} className="animate-fade">
+      {contextHolder}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.02em' }}>Employees</h1>
@@ -185,8 +196,7 @@ export default function EmployeesPage() {
       <div className="card" style={{ overflow: 'hidden' }}>
         {loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem', color: 'var(--text-muted)', gap: '0.75rem' }}>
-            <svg className="spin" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="30" strokeDashoffset="10" /></svg>
-            Loading employees...
+            <Spin description="Loading Employees..." size="large" />
           </div>
         ) : employees.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
