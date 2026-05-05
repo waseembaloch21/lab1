@@ -10,6 +10,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
+  EuroOutlined,
 } from '@ant-design/icons'
 
 export default function Sidebar({ userName = '', userRole = '' }) {
@@ -49,7 +50,13 @@ export default function Sidebar({ userName = '', userRole = '' }) {
       icon: <DollarOutlined />,
       label: 'Payroll',
     },
+     {
+      key: '/erd',
+      icon: <EuroOutlined />,
+      label: 'ERD',
+    },
   ]
+  
 
   return (
     <aside
@@ -63,14 +70,12 @@ export default function Sidebar({ userName = '', userRole = '' }) {
         top: 0,
       }}
     >
-      {/* Toggle Button */}
       <div style={{ padding: 16 }}>
         <Button type="primary" onClick={toggleCollapsed} style={{ width: '100%' }}>
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         </Button>
       </div>
 
-      {/* Menu */}
       <Menu
         theme="dark"
         mode="inline"
@@ -80,7 +85,6 @@ export default function Sidebar({ userName = '', userRole = '' }) {
         onClick={({ key }) => router.push(key)}
       />
 
-      {/* User Info + Logout */}
       <div style={{ marginTop: 'auto', padding: 16 }}>
         {!collapsed && (
           <div style={{ marginBottom: 12 }}>

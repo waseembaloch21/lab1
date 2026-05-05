@@ -59,7 +59,7 @@ export async function POST(req) {
         ${body.last_name},
         ${body.email},
         ${body.phone || null},          
-        ${body.department_id || null},
+        ${body.department_id ? parseInt(body.department_id, 10) : null},
         ${body.position},
         ${body.employment_type},
         ${body.status || 'active'},

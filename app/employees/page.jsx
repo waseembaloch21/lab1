@@ -91,7 +91,7 @@ export default function EmployeesPage() {
     try {
       const payload = {
         ...form,
-        department_id: form.department_id || null,
+        department_id: form.department_id ? parseInt(form.department_id, 10) : null,
         salary: form.salary === '' ? 0 : Number(form.salary),
         phone: form.phone?.trim() || null,
         address: form.address?.trim() || null,
@@ -118,7 +118,7 @@ export default function EmployeesPage() {
           ? 'Employee updated successfully'
           : 'Employee added successfully',
       })
-      
+
       setShowModal(false)
       load()
     } catch (err) {
@@ -158,6 +158,7 @@ export default function EmployeesPage() {
           Add Employee
         </button>
       </div>
+
       <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
@@ -166,21 +167,16 @@ export default function EmployeesPage() {
           <input className="input" placeholder="Search by name, email, ID..." value={search}
             onChange={e => setSearch(e.target.value)} style={{ paddingLeft: '2rem' }} />
         </div>
+
         <select className="input" style={{ width: 'auto', minWidth: 160 }}
-          value={filterDept}
-          onChange={e => setFilterDept(e.target.value)}>
-          <option value="">All Departments</option>
-          <option value="1">Administration</option>
-          <option value="2">Marketing</option>
-          <option value="3">Shipping</option>
-          <option value="4">IT</option>
-          <option value="5">Sales</option>
-          <option value="6">Finance</option>
-          <option value="7">Accounting</option>
-          <option value="8">Manufacturing</option>
-          <option value="9">Recruiting</option>
-          {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+          value={form.department_id || ''}
+          onChange={e => setForm(p => ({ ...p, department_id: e.target.value || null }))}>
+          <option value="">No Department</option>
+          {departments.map(d => (
+            <option key={d.id} value={d.id}>{d.name}</option>
+          ))}
         </select>
+
         <select className="input" style={{ width: 'auto', minWidth: 140 }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Status</option>
           <option value="active">Active</option>
@@ -188,8 +184,8 @@ export default function EmployeesPage() {
           <option value="on-leave">On Leave</option>
           <option value="terminated">Terminated</option>
         </select>
-        {(search || filterDept || filterStatus) && (
-          <button className="btn btn-ghost btn-sm" onClick={() => { setSearch(''); setFilterDept(''); setFilterStatus('') }}>Clear</button>
+        {(search || form.department_id || filterStatus) && (
+          <button className="btn btn-ghost btn-sm" onClick={() => { setSearch(''); setForm(p => ({ ...p, department_id: null })); setFilterStatus('') }}>Clear</button>
         )}
       </div>
 
@@ -287,19 +283,11 @@ export default function EmployeesPage() {
               <div>
                 <label className="form-label">Department</label>
                 <select className="input" style={{ width: 'auto', minWidth: 160 }}
-                  value={filterDept}
-                  onChange={e => setFilterDept(e.target.value)}>
-                  <option value="">All Departments</option>
-                  <option value="1">Administration</option>
-                  <option value="2">Marketing</option>
-                  <option value="3">Shipping</option>
-                  <option value="4">IT</option>
-                  <option value="5">Sales</option>
-                  <option value="6">Finance</option>
-                  <option value="7">Accounting</option>
-                  <option value="8">Manufacturing</option>
-                  <option value="9">Recruiting</option>
-                  {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                  value={form.department_id || ''} onChange={e => setForm(p => ({ ...p, department_id: e.target.value || null }))}>
+                  <option value="">No Department</option>
+                  {departments.map(d => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
                 </select>
               </div>
               <div>
