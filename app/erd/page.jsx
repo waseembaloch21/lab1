@@ -1,85 +1,117 @@
-"use client";
+'use client'
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react'
+import { Spin } from 'antd'
 
-export default function Erd() {
+export default function ErdPage() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/erd')
+      .then(res => res.json())
+      .then(d => {
+        setData(d)
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-100 pt-20 px-4">
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
 
-            <motion.div
-                initial={{ opacity: 0, y: -40 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-12"
-            >
-                <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text pb-3 text-transparent">
-                    ERD Diagram
-                </h1>
-                <p className="text-gray-600 mt-4 text-lg">
-                    Explore your database structure in a clean, visual format
-                </p>
-            </motion.div>
+  if (!data) return null
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.01 }}
-                transition={{ duration: 0.4 }}
-                className="max-w-6xl mx-auto bg-white/70 backdrop-blur-xl shadow-2xl rounded-3xl p-6 md:p-10 border border-gray-200"
-            >
+  return (
+    <div style={{ padding: '2rem', maxWidth: 1200 }}>
 
-                <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-inner bg-gray-50">
+      {/* Header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700 }}>
+          ERD Overview
+        </h1>
+        <p style={{ color: 'var(--text-secondary)' }}>
+          Visual representation of your database structure
+        </p>
+      </div>
 
-                    <div className="w-full h-[400px] md:h-[600px]">
-                        <iframe
-                            src="/Erd.pdf"
-                            title="ERD PDF"
-                            className="w-full h-full"
-                        />
-                    </div>
-
+      {/* Stats */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))',
+        gap: '1rem',
+        marginBottom: '2rem'
+      }}>
+        {[
+          { label: 'Total Tables', value: data.stats.tables, icon: '📦' },
+          { label: 'Relationships', value: data.stats.relations, icon: '🔗' },
+          { label: 'Columns', value: data.stats.columns, icon: '📊' },
+        ].map((s, i) => (
+          <div key={i} className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: '0.8rem', color: 'gray' }}>
+                  {s.label}
                 </div>
-
-                <div className="flex flex-col md:flex-row gap-4 justify-center mt-6">
-
-                    <motion.a
-                        href="/Erd.pdf"
-                        target="_blank"
-                        rel="noreferrer"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-6 py-3 rounded-full text-white font-medium bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg hover:shadow-purple-400/40 text-center"
-                    >
-                        Open Full Screen
-                    </motion.a>
-
-                    <motion.a
-                        href="/Erd.pdf"
-                        download
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-6 py-3 rounded-full font-medium border border-gray-300 text-gray-700 hover:bg-gray-100 text-center"
-                    >
-                        Download PDF
-                    </motion.a>
-
+                <div style={{ fontSize: '1.6rem', fontWeight: 700 }}>
+                  {s.value}
                 </div>
+              </div>
+              <div style={{ fontSize: '1.5rem' }}>{s.icon}</div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-            </motion.div>
+      {/* Tables List */}
+      <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+        <h2 style={{ fontWeight: 600, marginBottom: '1rem' }}>
+          Database Tables
+        </h2>
 
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="max-w-4xl mx-auto mt-12 text-center"
-            >
-                <p className="text-gray-600 leading-relaxed">
-                    This ERD provides a structured overview of your system, showing how
-                    entities like employees, departments, and regions are connected.
-                    Understanding these relationships helps in designing efficient and
-                    scalable databases.
-                </p>
-            </motion.div>
-
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {data.tables.map((t, i) => (
+            <div key={i} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid #eee',
+              paddingBottom: '0.5rem'
+            }}>
+              <span>{t.name}</span>
+              <span style={{ color: 'gray', fontSize: '0.8rem' }}>
+                {t.columns} columns
+              </span>
+            </div>
+          ))}
         </div>
-    );
-};
+      </div>
+
+      {/* PDF Viewer (Keep it like before) */}
+      <div className="card" style={{ padding: '1.5rem' }}>
+        <h2 style={{ fontWeight: 600, marginBottom: '1rem' }}>
+          ERD Diagram
+        </h2>
+
+        <iframe
+          src="/Erd.pdf"
+          style={{ width: '100%', height: '500px', borderRadius: 10 }}
+        />
+
+        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+          <a href="/Erd.pdf" target="_blank">Open Full Screen</a>
+          <a href="/Erd.pdf" download>Download</a>
+        </div>
+      </div>
+
+    </div>
+  )
+}

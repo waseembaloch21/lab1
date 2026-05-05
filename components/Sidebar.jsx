@@ -57,8 +57,8 @@ export default function Sidebar({ userName = '', userRole = '' }) {
     },
   ]
   
-
   return (
+
     <aside
       style={{
         width: collapsed ? 80 : 240,
@@ -70,6 +70,7 @@ export default function Sidebar({ userName = '', userRole = '' }) {
         top: 0,
       }}
     >
+
       <div style={{ padding: 16 }}>
         <Button type="primary" onClick={toggleCollapsed} style={{ width: '100%' }}>
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -104,6 +105,7 @@ export default function Sidebar({ userName = '', userRole = '' }) {
         >
           {!collapsed && 'Logout'}
         </Button>
+        
       </div>
     </aside>
   )
